@@ -26,6 +26,8 @@ module.exports = function lambdaProxy(pluginSettings) {
         });
 
       if (params.stripPath) {
+        req.egContext.lambda.resourcePath =
+          `/${req.params[0] || ''}${req._parsedUrl.search || ''}`;
       }
 
       if (params.ignorePath) {

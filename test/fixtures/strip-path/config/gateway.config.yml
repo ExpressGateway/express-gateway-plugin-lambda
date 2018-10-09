@@ -4,6 +4,7 @@ http:
 apiEndpoints:
   default:
     host: '*'
+    path: '/api/v1/*'
 policies:
   - lambda-proxy
 pipelines:
@@ -14,3 +15,4 @@ pipelines:
       - lambda-proxy:
         - action:
             functionName: 'httpExample'
+            stripPath: true

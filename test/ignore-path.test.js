@@ -46,9 +46,7 @@ describe('lambda-proxy policy : ignore path', () => {
       callback(null, {
         Payload: JSON.stringify({
           statusCode: 200,
-          body: JSON.stringify({
-            hello: 'world'
-          })
+          body: 'Hello World'
         })
       });
     });
