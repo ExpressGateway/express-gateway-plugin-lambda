@@ -4,6 +4,9 @@ const axios = require('axios').default;
 const awsMock = require('aws-sdk-mock');
 const gateway = require('express-gateway');
 
+const { disableExpressGatewayConfigWatchers,
+        silenceExpressGatewayLoggers } = require('./helpers');
+
 const CONFIG_PATH = path.join(__dirname, './fixtures/basic/config');
 
 describe('lambda-proxy policy', () => {
@@ -93,21 +96,3 @@ describe('lambda-proxy policy', () => {
     app.close(() => done());
   });
 });
-
-function disableExpressGatewayConfigWatchers() {
-  if (!process.env.EG_DISABLE_CONFIG_WATCH) {
-    process.env.EG_DISABLE_CONFIG_WATCH = true;
-  }
-}
-
-function silenceExpressGatewayLoggers() {
-  const logger = require('express-gateway/lib/logger');
-
-  for (const name in logger) {
-    if (typeof logger[name] !== 'object') {
-      continue;
-    }
-
-    logger[name].silent = true;
-  }
-}
