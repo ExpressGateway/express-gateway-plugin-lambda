@@ -112,7 +112,7 @@ describe('lambda-proxy policy : basic', () => {
 
           const requestContext = requestPayload.requestContext;
 
-          assert.strictEqual(requestContext.resourcePath, '/world');
+          assert.strictEqual(requestPayload.path, '/world');
           assert(requestContext.apiEndpoint);
           assert.strictEqual(requestContext.apiEndpoint.apiEndpointName, 'default');
         });

@@ -55,7 +55,7 @@ describe('lambda-proxy policy : ignore path', () => {
       .get('/world')
       .then(res => {
         assert.strictEqual(res.status, 200);
-        assert.strictEqual(requestPayload.requestContext.resourcePath, '/');
+        assert.strictEqual(requestPayload.path, '/');
       });
   });
 

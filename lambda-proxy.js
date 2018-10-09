@@ -14,24 +14,27 @@ const DEFAULTS = {
 };
 
 module.exports = function lambdaProxy(pluginSettings) {
-  return params => {
-    params = Object.assign({}, DEFAULTS, pluginSettings, params);
+  return policyParams => {
+    policyParams = Object.assign({}, DEFAULTS, pluginSettings, policyParams);
 
     return (req, res) => {
+      let params = Object.assign({}, policyParams);
+
       req.egContext.lambda = Object.assign({},
         req.egContext.lambda || {},
         {
-          resourcePath: req.url,
           apiEndpoint: req.egContext.apiEndpoint
         });
 
+      params.path = req.url;
+
       if (params.stripPath) {
-        req.egContext.lambda.resourcePath =
+        params.path =
           `/${req.params[0] || ''}${req._parsedUrl.search || ''}`;
       }
 
       if (params.ignorePath) {
-        req.egContext.lambda.resourcePath = '/';
+        params.path = '/';
       }
 
       if (req._body === true) { // check if body-parser has run
@@ -89,6 +92,7 @@ function prepareRequestWithProxyIntegration(req, body, params) {
     Qualifier: params.qualifier,
     Payload: Buffer.from(JSON.stringify({
       httpMethod: req.method,
+      path: params.path,
       queryStringParameters: url.parse(req.url, true).query,
       pathParameters: req.params,
       headers: req.headers,

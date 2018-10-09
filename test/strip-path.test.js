@@ -55,7 +55,7 @@ describe('lambda-proxy policy : strip path', () => {
       .get('/api/v1/world')
       .then(res => {
         assert.strictEqual(res.status, 200);
-        assert.strictEqual(requestPayload.requestContext.resourcePath, '/world');
+        assert.strictEqual(requestPayload.path, '/world');
       });
   });
 
