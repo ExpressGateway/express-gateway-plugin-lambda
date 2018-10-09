@@ -1,6 +1,6 @@
 const path = require('path');
 
-const initialize = (configPath) => {
+const prepare = (configPath) => {
   const config = require('express-gateway/lib/config');
   config.gatewayConfigPath = path.join(configPath, 'gateway.config.yml');
   config.loadGatewayConfig();
@@ -29,4 +29,4 @@ const silenceLoggers = () => {
   }
 };
 
-module.exports = { initialize, disableConfigWatchers, silenceLoggers };
+module.exports = { prepare, disableConfigWatchers, silenceLoggers };

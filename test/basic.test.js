@@ -4,7 +4,7 @@ const axios = require('axios').default;
 const awsMock = require('aws-sdk-mock');
 const gateway = require('express-gateway');
 
-const { initialize } = require('./helpers');
+const { prepare } = require('./helpers');
 
 const CONFIG_PATH = path.join(__dirname, './fixtures/basic/config');
 
@@ -12,7 +12,7 @@ describe('lambda-proxy policy : basic', () => {
   let app, axiosInstance;
 
   before(done => {
-    initialize(CONFIG_PATH);
+    prepare(CONFIG_PATH);
 
     gateway()
       .load(CONFIG_PATH)
