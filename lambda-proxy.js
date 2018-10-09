@@ -1,12 +1,14 @@
 const promisify = require('util').promisify;
 const url = require('url');
 const AWS = require('aws-sdk');
+const debug = require('debug')('express-gateway-plugin-lambda:lambda-proxy');
 const getBody = promisify(require('raw-body'));
 const fileType = require('file-type');
 
 const DEFAULTS = {
   invocationType: 'RequestResponse',
-  logType: 'None'
+  logType: 'None',
+  unhandledStatus: 500
 };
 
 module.exports = params => {
@@ -22,7 +24,7 @@ module.exports = params => {
       invokeLambda(req, res, body, params);
     })
     .catch(err => {
-      console.error(err);
+      debug('Failed to receive request body:', err);
       res.send(400);
     });
   };
@@ -32,18 +34,42 @@ function invokeLambda(req, res, body, params) {
   const lambda = new AWS.Lambda();
   const invoke = promisify(lambda.invoke.bind(lambda));
 
-  const parts = url.parse(req.url, true);
+  const funcOpts = prepareRequestWithProxyIntegration(req, body, params);
 
+  invoke(funcOpts).then(data => {
+    if (data.FunctionError) {
+      if (data.FunctionError === 'Unhandled') {
+        res.statusCode = params.unhandledStatus;
+      } else {
+        res.statusCode = data.StatusCode;
+      }
+
+      debug(`Failed to execute Lambda function (${data.FunctionError}):`,
+        JSON.parse(data.Payload).errorMessage);
+
+      res.end();
+      return;
+    }
+
+    respondWithProxyIntegration(res, JSON.parse(data.Payload));
+
+  })
+  .catch(ex => {
+    debug(ex);
+  });
+}
+
+function prepareRequestWithProxyIntegration(req, body, params) {
   const isBinary = req.isBinary
     || !!fileType(body)
     || (req.headers['content-type'] && req.headers['content-type'] === 'application/octet-stream');
 
-  const funcOpts = {
+  return {
     FunctionName: params.functionName,
     Qualifier: params.qualifier,
     Payload: Buffer.from(JSON.stringify({
       httpMethod: req.method,
-      queryStringParameters: parts.query,
+      queryStringParameters: url.parse(req.url, true).query,
       pathParameters: req.params,
       headers: req.headers,
       isBase64Encoded: isBinary,
@@ -52,62 +78,47 @@ function invokeLambda(req, res, body, params) {
         : null
     }))
   };
+}
 
-  invoke(funcOpts).then(data => {
-    if (data.FunctionError) {
-      if (data.FunctionError === 'Unhandled') {
-        console.error(JSON.parse(data.Payload).errorMessage);
-        res.statusCode = params.unhandledStatus;
+function respondWithProxyIntegration(res, payload) {
+  const { statusCode,
+          headers,
+          body,
+          isBase64Encoded } = payload;
+
+  res.statusCode = statusCode || 200;
+
+  let contentType;
+
+  for (name in headers) {
+    if (name.toLowerCase() === 'content-type') {
+      contentType = headers[name];
+    }
+
+    res.setHeader(name, headers[name]);
+  }
+
+  if (!contentType) {
+    // take a best guess
+    const type = fileType(body);
+    if (isBase64Encoded && type && type.mime) {
+      res.setHeader('Content-Type', type.mime);
+    } else if (!isBase64Encoded) {
+      // performance penalty on JSON.parse for large content lengths
+      if (body.length > (5 * 1.049e+6) /* 5MiB */) {
+        res.setHeader('Content-Type', 'text/plain');
       } else {
-        res.statusCode = data.StatusCode;
-      }
-
-      res.end();
-      return;
-    }
-
-    const output = JSON.parse(data.Payload);
-    res.statusCode = output.statusCode || 200;
-
-    let contentType;
-
-    for (name in output.headers) {
-      if (name.toLowerCase() === 'content-type') {
-        contentType = output.headers[name];
-      }
-
-      res.setHeader(name, output.headers[name]);
-    }
-
-    if (!contentType) {
-      // take a best guess
-      const type = fileType(output.body);
-      if (output.isBase64Encoded && type && type.mime) {
-        res.setHeader('Content-Type', type.mime);
-      } else if (!output.isBase64Encoded) {
-        // performance penalty on JSON.parse for large content lengths
-        if (output.body.length > (5 * 1.049e+6) /* 5MiB */) {
+        try {
+          const _ = JSON.parse(body.toString());
+          res.setHeader('Content-Type', 'application/json');
+        } catch (_) {
           res.setHeader('Content-Type', 'text/plain');
-        } else {
-          try {
-            const _ = JSON.parse(output.body.toString());
-            res.setHeader('Content-Type', 'application/json');
-          } catch (_) {
-            res.setHeader('Content-Type', 'text/plain');
-          }
         }
-      } else {
-        res.setHeader('Content-Type', 'application/octet-stream');
       }
+    } else {
+      res.setHeader('Content-Type', 'application/octet-stream');
     }
+  }
 
-    const body = output.isBase64Encoded
-      ? Buffer.from(output.body, 'base64')
-      : output.body;
-
-    res.end(body);
-  })
-  .catch(ex => {
-    console.error(ex);
-  });
+  res.end(isBase64Encoded ? Buffer.from(body, 'base64') : body);
 }

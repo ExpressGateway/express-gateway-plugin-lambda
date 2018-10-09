@@ -72,6 +72,21 @@ describe('Lambda Proxy Integration', () => {
       });
   });
 
+  it('returns a custom status code on Unhandled error', () => {
+    awsMock.mock('Lambda', 'invoke', {
+      FunctionError: 'Unhandled',
+      Payload: JSON.stringify({
+        errorMessage: 'test error'
+      })
+    });
+
+    return axiosInstance
+      .get('/')
+      .catch(err => {
+        assert.strictEqual(err.response.status, 500);
+      });
+  });
+
   after(done => {
     app.close(() => done());
   });

@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.327.0",
+    "debug": "^4.1.0",
     "file-type": "^10.0.0",
     "raw-body": "^2.3.3"
   },
