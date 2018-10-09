@@ -4,7 +4,6 @@ http:
 apiEndpoints:
   default:
     host: '*'
-    path: '/:proxy'
 policies:
   - lambda-proxy
 pipelines:

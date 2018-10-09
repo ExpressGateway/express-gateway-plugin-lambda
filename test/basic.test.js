@@ -4,17 +4,15 @@ const axios = require('axios').default;
 const awsMock = require('aws-sdk-mock');
 const gateway = require('express-gateway');
 
-const { disableExpressGatewayConfigWatchers,
-        silenceExpressGatewayLoggers } = require('./helpers');
+const { initialize } = require('./helpers');
 
 const CONFIG_PATH = path.join(__dirname, './fixtures/basic/config');
 
-describe('lambda-proxy policy', () => {
+describe('lambda-proxy policy : basic', () => {
   let app, axiosInstance;
 
   before(done => {
-    disableExpressGatewayConfigWatchers();
-    silenceExpressGatewayLoggers();
+    initialize(CONFIG_PATH);
 
     gateway()
       .load(CONFIG_PATH)
@@ -33,6 +31,7 @@ describe('lambda-proxy policy', () => {
   });
 
   beforeEach(() => {
+    require('express-gateway/lib/config').loadConfig('gateway');
     awsMock.restore();
   });
 
@@ -45,7 +44,7 @@ describe('lambda-proxy policy', () => {
     });
 
     return axiosInstance
-      .get('/')
+      .get('/world')
       .catch(err => {
         assert.strictEqual(err.response.status, 503);
       });
@@ -66,7 +65,7 @@ describe('lambda-proxy policy', () => {
       });
 
       return axiosInstance
-        .get('/')
+        .get('/world')
         .then(res => {
           assert.strictEqual(res.headers['content-type'], 'application/json');
           assert.strictEqual(res.headers['custom'], 'Success');
@@ -84,10 +83,38 @@ describe('lambda-proxy policy', () => {
       });
 
       return axiosInstance
-        .get('/')
+        .get('/world')
         .then(res => {
           assert.strictEqual(res.headers['content-type'], 'application/octet-stream');
           assert.strictEqual(res.data, 'Hello World');
+        });
+    });
+
+    it('includes a request context', () => {
+      let requestPayload;
+
+      awsMock.mock('Lambda', 'invoke', (params, callback) => {
+        requestPayload = JSON.parse(params.Payload);
+
+        callback(null, {
+          Payload: JSON.stringify({
+            statusCode: 200,
+            body: ''
+          })
+        });
+      });
+
+      return axiosInstance
+        .get('/world')
+        .then(res => {
+          assert.strictEqual(res.status, 200);
+          assert(requestPayload.requestContext);
+
+          const requestContext = requestPayload.requestContext;
+
+          assert.strictEqual(requestContext.resourcePath, '/world');
+          assert(requestContext.apiEndpoint);
+          assert.strictEqual(requestContext.apiEndpoint.apiEndpointName, 'default');
         });
     });
   });

@@ -8,7 +8,9 @@ const fileType = require('file-type');
 const DEFAULTS = {
   invocationType: 'RequestResponse',
   logType: 'None',
-  unhandledStatus: 500
+  unhandledStatus: 500,
+  ignorePath: false,
+  stripPath: false
 };
 
 module.exports = function lambdaProxy(pluginSettings) {
@@ -16,6 +18,20 @@ module.exports = function lambdaProxy(pluginSettings) {
     params = Object.assign({}, DEFAULTS, pluginSettings, params);
 
     return (req, res) => {
+      req.egContext.lambda = Object.assign({},
+        req.egContext.lambda || {},
+        {
+          resourcePath: req.url,
+          apiEndpoint: req.egContext.apiEndpoint
+        });
+
+      if (params.stripPath) {
+      }
+
+      if (params.ignorePath) {
+        req.egContext.lambda.resourcePath = '/';
+      }
+
       if (req._body === true) { // check if body-parser has run
         invokeLambda(req, res, req.body, params);
         return;
@@ -74,6 +90,7 @@ function prepareRequestWithProxyIntegration(req, body, params) {
       queryStringParameters: url.parse(req.url, true).query,
       pathParameters: req.params,
       headers: req.headers,
+      requestContext: req.egContext.lambda,
       isBase64Encoded: isBinary,
       body: body.length > 0
         ? body.toString(isBinary ? 'base64' : 'utf8')
