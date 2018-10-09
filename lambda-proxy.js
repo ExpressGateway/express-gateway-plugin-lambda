@@ -11,22 +11,24 @@ const DEFAULTS = {
   unhandledStatus: 500
 };
 
-module.exports = params => {
-  params = Object.assign({}, DEFAULTS, params);
+module.exports = function lambdaProxy(pluginSettings) {
+  return params => {
+    params = Object.assign({}, DEFAULTS, pluginSettings, params);
 
-  return (req, res) => {
-    if (req._body === true) { // check if body-parser has run
-      invokeLambda(req, res, req.body, params);
-      return;
-    }
+    return (req, res) => {
+      if (req._body === true) { // check if body-parser has run
+        invokeLambda(req, res, req.body, params);
+        return;
+      }
 
-    getBody(req).then(body => {
-      invokeLambda(req, res, body, params);
-    })
-    .catch(err => {
-      debug('Failed to receive request body:', err);
-      res.send(400);
-    });
+      getBody(req).then(body => {
+        invokeLambda(req, res, body, params);
+      })
+      .catch(err => {
+        debug('Failed to receive request body:', err);
+        res.send(400);
+      });
+    };
   };
 };
 

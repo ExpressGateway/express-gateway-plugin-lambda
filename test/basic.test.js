@@ -6,7 +6,7 @@ const gateway = require('express-gateway');
 
 const CONFIG_PATH = path.join(__dirname, './fixtures/basic/config');
 
-describe('Lambda Proxy Integration', () => {
+describe('lambda-proxy policy', () => {
   let app, axiosInstance;
 
   before(done => {
@@ -33,45 +33,6 @@ describe('Lambda Proxy Integration', () => {
     awsMock.restore();
   });
 
-  it('translates Lambda function output to an HTTP response', () => {
-    awsMock.mock('Lambda', 'invoke', {
-      Payload: JSON.stringify({
-        statusCode: 200,
-        headers: {
-          'Custom': 'Success'
-        },
-        body: JSON.stringify({
-          hello: 'world'
-        })
-      })
-    });
-
-    return axiosInstance
-      .get('/')
-      .then(res => {
-        assert.strictEqual(res.headers['content-type'], 'application/json');
-        assert.strictEqual(res.headers['custom'], 'Success');
-        assert.deepStrictEqual(res.data, { hello: 'world' });
-      });
-  });
-
-  it('supports base64-encoded response bodies', () => {
-    awsMock.mock('Lambda', 'invoke', {
-      Payload: JSON.stringify({
-        statusCode: 200,
-        body: 'SGVsbG8gV29ybGQ=',
-        isBase64Encoded: true
-      })
-    });
-
-    return axiosInstance
-      .get('/')
-      .then(res => {
-        assert.strictEqual(res.headers['content-type'], 'application/octet-stream');
-        assert.strictEqual(res.data, 'Hello World');
-      });
-  });
-
   it('returns a custom status code on Unhandled error', () => {
     awsMock.mock('Lambda', 'invoke', {
       FunctionError: 'Unhandled',
@@ -83,8 +44,49 @@ describe('Lambda Proxy Integration', () => {
     return axiosInstance
       .get('/')
       .catch(err => {
-        assert.strictEqual(err.response.status, 500);
+        assert.strictEqual(err.response.status, 503);
       });
+  });
+
+  describe('with proxy integration enabled', () => {
+    it('translates Lambda function output to an HTTP response', () => {
+      awsMock.mock('Lambda', 'invoke', {
+        Payload: JSON.stringify({
+          statusCode: 200,
+          headers: {
+            'Custom': 'Success'
+          },
+          body: JSON.stringify({
+            hello: 'world'
+          })
+        })
+      });
+
+      return axiosInstance
+        .get('/')
+        .then(res => {
+          assert.strictEqual(res.headers['content-type'], 'application/json');
+          assert.strictEqual(res.headers['custom'], 'Success');
+          assert.deepStrictEqual(res.data, { hello: 'world' });
+        });
+    });
+
+    it('supports base64-encoded response bodies', () => {
+      awsMock.mock('Lambda', 'invoke', {
+        Payload: JSON.stringify({
+          statusCode: 200,
+          body: 'SGVsbG8gV29ybGQ=',
+          isBase64Encoded: true
+        })
+      });
+
+      return axiosInstance
+        .get('/')
+        .then(res => {
+          assert.strictEqual(res.headers['content-type'], 'application/octet-stream');
+          assert.strictEqual(res.data, 'Hello World');
+        });
+    });
   });
 
   after(done => {

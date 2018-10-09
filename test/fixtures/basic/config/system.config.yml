@@ -3,7 +3,6 @@ db:
   redis:
     emulate: true
     namespace: EG
-
 crypto:
   cipherKey: sensitiveKey
   algorithm: aes256
@@ -25,3 +24,4 @@ plugins:
  express-gateway-plugin-lambda:
    # package: '../../'
    package: '../../../'
+   unhandledStatus: 503

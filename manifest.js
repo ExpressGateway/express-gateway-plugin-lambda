@@ -6,7 +6,7 @@ module.exports = {
   init: pluginContext => {
     pluginContext.registerPolicy({
       name: 'lambda-proxy',
-      policy: lambdaProxy 
+      policy: lambdaProxy(pluginContext.settings) 
     });
   }
 };
