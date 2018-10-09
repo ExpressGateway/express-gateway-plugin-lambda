@@ -1,0 +1,16 @@
+http:
+  host: localhost
+  port: 0
+apiEndpoints:
+  default:
+    host: '*'
+policies:
+  - lambda-proxy
+pipelines:
+  default:
+    apiEndpoints:
+      - default
+    policies:
+      - lambda-proxy:
+        - action:
+            functionName: 'httpExample'
