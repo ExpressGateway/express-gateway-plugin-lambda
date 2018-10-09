@@ -18,36 +18,18 @@ module.exports = function lambdaProxy(pluginSettings) {
     policyParams = Object.assign({}, DEFAULTS, pluginSettings, policyParams);
 
     return (req, res) => {
-      let params = Object.assign({}, policyParams);
-
-      req.egContext.lambda = Object.assign({},
-        req.egContext.lambda || {},
-        {
-          apiEndpoint: req.egContext.apiEndpoint
-        });
-
-      params.path = req.url;
-
-      if (params.stripPath) {
-        params.path =
-          `/${req.params[0] || ''}${req._parsedUrl.search || ''}`;
-      }
-
-      if (params.ignorePath) {
-        params.path = '/';
-      }
 
       if (req._body === true) { // check if body-parser has run
-        invokeLambda(req, res, req.body, params);
+        invokeLambda(req, res, req.body, policyParams);
         return;
       }
 
       getBody(req).then(body => {
-        invokeLambda(req, res, body, params);
+        invokeLambda(req, res, body, policyParams);
       })
       .catch(err => {
         debug('Failed to receive request body:', err);
-        res.send(400);
+        res.sendStatus(400);
       });
     };
   };
@@ -87,12 +69,33 @@ function prepareRequestWithProxyIntegration(req, body, params) {
     || !!fileType(body)
     || (req.headers['content-type'] && req.headers['content-type'] === 'application/octet-stream');
 
+  req.egContext.lambda = Object.assign({},
+    req.egContext.lambda || {},
+    {
+      apiEndpoint: req.egContext.apiEndpoint,
+      resourcePath: req.route.path,
+      httpMethod: req.method,
+      requestId: req.egContext.requestID
+    });
+
+  let requestPath = req.url;
+
+  if (params.stripPath) {
+    requestPath =
+      `/${req.params[0] || ''}${req._parsedUrl.search || ''}`;
+  }
+
+  if (params.ignorePath) {
+    requestPath = '/';
+  }
+
   return {
     FunctionName: params.functionName,
     Qualifier: params.qualifier,
     Payload: Buffer.from(JSON.stringify({
       httpMethod: req.method,
-      path: params.path,
+      path: requestPath,
+      resource: req.route.path,
       queryStringParameters: url.parse(req.url, true).query,
       pathParameters: req.params,
       headers: req.headers,
