@@ -10,7 +10,8 @@ const DEFAULTS = {
   unhandledStatus: 500,
   useCustomIntegration: false,
   ignorePath: false,
-  stripPath: false
+  stripPath: false,
+  maxJSONParseLength: (5 * 1.049e+6) // 5MiB
 };
 
 module.exports = function lambdaProxy(pluginSettings) {

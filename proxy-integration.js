@@ -88,7 +88,7 @@ class ProxyIntegration {
         }
       } else {
         // performance penalty on JSON.parse for large content lengths
-        if (body.length > (5 * 1.049e+6) /* 5MiB */) {
+        if (body.length > this.params.maxJSONParseLength) {
           res.setHeader('Content-Type', 'text/plain');
         } else {
           try {
