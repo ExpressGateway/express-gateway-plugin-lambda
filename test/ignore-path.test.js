@@ -15,10 +15,9 @@ describe('lambda-proxy policy : ignore path', () => {
     prepare(CONFIG_PATH);
 
     gateway()
-      .load(CONFIG_PATH)
       .run()
-      .then(servers => {
-        app = servers[0].app;
+      .then(([server]) => {
+        app = server.app;
 
         const port = app.address().port;
         axiosInstance = axios.create({
