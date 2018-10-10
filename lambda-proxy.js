@@ -127,11 +127,15 @@ function respondWithProxyIntegration(res, payload) {
   }
 
   if (!contentType) {
-    // take a best guess
-    const type = fileType(body);
-    if (isBase64Encoded && type && type.mime) {
-      res.setHeader('Content-Type', type.mime);
-    } else if (!isBase64Encoded) {
+    if (isBase64Encoded) {
+      // take a best guess
+      const type = fileType(Buffer.from(body, 'base64'));
+      if (type && type.mime) {
+        res.setHeader('Content-Type', type.mime);
+      } else {
+        res.setHeader('Content-Type', 'application/octet-stream');
+      }
+    } else {
       // performance penalty on JSON.parse for large content lengths
       if (body.length > (5 * 1.049e+6) /* 5MiB */) {
         res.setHeader('Content-Type', 'text/plain');
@@ -143,8 +147,6 @@ function respondWithProxyIntegration(res, payload) {
           res.setHeader('Content-Type', 'text/plain');
         }
       }
-    } else {
-      res.setHeader('Content-Type', 'application/octet-stream');
     }
   }
 

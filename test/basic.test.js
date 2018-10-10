@@ -1,4 +1,5 @@
 const assert = require('assert');
+const fs = require('fs');
 const path = require('path');
 const axios = require('axios').default;
 const awsMock = require('aws-sdk-mock');
@@ -134,10 +135,80 @@ describe('lambda-proxy policy : basic', () => {
 
           const requestContext = requestPayload.requestContext;
 
-          assert.strictEqual(requestPayload.path, '/world');
           assert(requestContext.apiEndpoint);
           assert.strictEqual(requestContext.apiEndpoint.apiEndpointName, 'default');
         });
+    });
+
+    describe('takes a best guess at content-type', () => {
+      it('known binary', () => {
+        const imagePath = path.join(__dirname, '/fixtures/assets/eg-favicon.png');
+        const image = fs.readFileSync(imagePath);
+
+        awsMock.mock('Lambda', 'invoke', {
+          Payload: JSON.stringify({
+            statusCode: 200,
+            body: image.toString('base64'),
+            isBase64Encoded: true
+          })
+        });
+
+        return axiosInstance
+          .get('/world')
+          .then(res => {
+            assert.strictEqual(res.status, 200);
+            assert.strictEqual(res.headers['content-type'], 'image/png');
+          });
+      });
+
+      it('plaintext', () => {
+        awsMock.mock('Lambda', 'invoke', {
+          Payload: JSON.stringify({
+            statusCode: 200,
+            body: 'Hello World',
+          })
+        });
+
+        return axiosInstance
+          .get('/world')
+          .then(res => {
+            assert.strictEqual(res.status, 200);
+            assert.strictEqual(res.headers['content-type'], 'text/plain');
+          });
+      });
+
+      it('JSON', () => {
+        awsMock.mock('Lambda', 'invoke', {
+          Payload: JSON.stringify({
+            statusCode: 200,
+            body: JSON.stringify({ hello: 'world' }),
+          })
+        });
+
+        return axiosInstance
+          .get('/world')
+          .then(res => {
+            assert.strictEqual(res.status, 200);
+            assert.strictEqual(res.headers['content-type'], 'application/json');
+          });
+      });
+
+      it('unknown binary', () => {
+        awsMock.mock('Lambda', 'invoke', {
+          Payload: JSON.stringify({
+            statusCode: 200,
+            body: Buffer.alloc(16, 3).toString('base64'),
+            isBase64Encoded: true
+          })
+        });
+
+        return axiosInstance
+          .get('/world')
+          .then(res => {
+            assert.strictEqual(res.status, 200);
+            assert.strictEqual(res.headers['content-type'], 'application/octet-stream');
+          });
+      });
     });
   });
 
