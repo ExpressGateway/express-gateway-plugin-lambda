@@ -19,7 +19,6 @@ module.exports = function lambdaProxy(pluginSettings) {
     policyParams = Object.assign({}, DEFAULTS, pluginSettings, policyParams);
 
     return (req, res) => {
-
       if (req._body === true) { // check if body-parser has run
         invokeLambda(req, res, req.body, policyParams);
         return;
