@@ -90,6 +90,28 @@ describe('lambda-proxy policy : basic', () => {
         });
     });
 
+    it('includes a path', () => {
+      let requestPayload;
+
+      awsMock.mock('Lambda', 'invoke', (params, callback) => {
+        requestPayload = JSON.parse(params.Payload);
+
+        callback(null, {
+          Payload: JSON.stringify({
+            statusCode: 200,
+            body: ''
+          })
+        });
+      });
+
+      return axiosInstance
+        .get('/world')
+        .then(res => {
+          assert.strictEqual(res.status, 200);
+          assert.strictEqual(requestPayload.path, '/world');
+        });
+    });
+
     it('includes a request context', () => {
       let requestPayload;
 
