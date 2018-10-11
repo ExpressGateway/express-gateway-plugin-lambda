@@ -3,10 +3,10 @@ const fileType = require('file-type');
 const { Integration } = require('./integration');
 
 class ProxyIntegration extends Integration {
-  prepare() {
+  build() {
     const req = this.req;
     const body = this.requestBody;
-    const params = this.params;
+    const settings = this.settings;
 
     const isBinary = req.isBinary
       || !!fileType(body)
@@ -23,18 +23,18 @@ class ProxyIntegration extends Integration {
 
     let requestPath = req.url;
 
-    if (params.stripPath) {
+    if (settings.stripPath) {
       requestPath =
         `/${req.params[0] || ''}${req._parsedUrl.search || ''}`;
     }
 
-    if (params.ignorePath) {
+    if (settings.ignorePath) {
       requestPath = '/';
     }
 
     return {
-      FunctionName: params.functionName,
-      Qualifier: params.qualifier,
+      FunctionName: settings.functionName,
+      Qualifier: settings.qualifier,
       Payload: Buffer.from(JSON.stringify({
         httpMethod: req.method,
         path: requestPath,
@@ -76,6 +76,11 @@ class ProxyIntegration extends Integration {
     }
 
     res.end(isBase64Encoded ? Buffer.from(body, 'base64') : body);
+  }
+
+  static invoke(options) {
+    const integration = new ProxyIntegration(options);
+    return integration.invoke();
   }
 }
 
