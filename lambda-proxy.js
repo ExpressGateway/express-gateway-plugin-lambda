@@ -2,7 +2,7 @@ const promisify = require('util').promisify;
 const AWS = require('aws-sdk');
 const debug = require('debug')('express-gateway-plugin-lambda:lambda-proxy');
 const getBody = promisify(require('raw-body'));
-const ProxyIntegration = require('./proxy-integration');
+const { ProxyIntegration } = require('./proxy-integration');
 
 const DEFAULTS = {
   invocationType: 'RequestResponse',

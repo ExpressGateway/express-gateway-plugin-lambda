@@ -1,14 +1,8 @@
 const url = require('url');
 const fileType = require('file-type');
+const { Integration } = require('./integration');
 
-class ProxyIntegration {
-  constructor(req, res, requestBody, params) {
-    this.req = req;
-    this.res = res;
-    this.requestBody = requestBody;
-    this.params = params;
-  }
-
+class ProxyIntegration extends Integration {
   prepare() {
     const req = this.req;
     const body = this.requestBody;
@@ -78,31 +72,11 @@ class ProxyIntegration {
     }
 
     if (!contentType) {
-      if (isBase64Encoded) {
-        // take a best guess
-        const type = fileType(Buffer.from(body, 'base64'));
-        if (type && type.mime) {
-          res.setHeader('Content-Type', type.mime);
-        } else {
-          res.setHeader('Content-Type', 'application/octet-stream');
-        }
-      } else {
-        // performance penalty on JSON.parse for large content lengths
-        if (body.length > this.params.maxJSONParseLength) {
-          res.setHeader('Content-Type', 'text/plain');
-        } else {
-          try {
-            const _ = JSON.parse(body.toString());
-            res.setHeader('Content-Type', 'application/json');
-          } catch (_) {
-            res.setHeader('Content-Type', 'text/plain');
-          }
-        }
-      }
+      res.setHeader('Content-Type', this.guessContentType(body, isBase64Encoded));
     }
 
     res.end(isBase64Encoded ? Buffer.from(body, 'base64') : body);
   }
 }
 
-module.exports = ProxyIntegration;
+module.exports = { ProxyIntegration };
