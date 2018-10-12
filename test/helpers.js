@@ -20,7 +20,7 @@ const disableConfigWatchers = () => {
 const silenceLoggers = () => {
   const logger = require('express-gateway/lib/logger');
 
-  for (const name in logger) {
+  for (const name of Object.keys(logger)) {
     if (typeof logger[name] !== 'object') {
       continue;
     }
