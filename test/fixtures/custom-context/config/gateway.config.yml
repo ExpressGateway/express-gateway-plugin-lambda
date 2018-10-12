@@ -1,0 +1,22 @@
+http:
+  host: localhost
+  port: 0
+apiEndpoints:
+  default:
+    host: '*'
+    path: '/:proxy'
+policies:
+  - expression
+  - lambda-proxy
+pipelines:
+  default:
+    apiEndpoints:
+      - default
+    policies:
+      - expression:
+        - action:
+            jscode: 'req.egContext.lambda = { hello: "expression" }'
+      - lambda-proxy:
+        - action:
+            functionName: 'httpExample'
+            useCustomIntegration: true

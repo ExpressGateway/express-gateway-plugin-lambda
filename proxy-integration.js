@@ -8,10 +8,6 @@ class ProxyIntegration extends Integration {
     const body = this.requestBody;
     const settings = this.settings;
 
-    const isBinary = req.isBinary
-      || !!fileType(body)
-      || (req.headers['content-type'] && req.headers['content-type'] === 'application/octet-stream');
-
     req.egContext.lambda = Object.assign({},
       req.egContext.lambda || {},
       {
@@ -43,9 +39,9 @@ class ProxyIntegration extends Integration {
         pathParameters: req.params,
         headers: req.headers,
         requestContext: req.egContext.lambda,
-        isBase64Encoded: isBinary,
+        isBase64Encoded: this.isRequestBodyBinary,
         body: body.length > 0
-          ? body.toString(isBinary ? 'base64' : 'utf8')
+          ? body.toString(this.isRequestBodyBinary ? 'base64' : 'utf8')
           : null
       }))
     };
@@ -55,7 +51,7 @@ class ProxyIntegration extends Integration {
     const { statusCode,
             headers,
             body,
-            isBase64Encoded } = payload;
+            isBase64Encoded } = JSON.parse(payload);
 
     const res = this.res;
 

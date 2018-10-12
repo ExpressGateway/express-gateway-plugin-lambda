@@ -12,16 +12,19 @@ class Integration {
   }
 
   guessContentType(body, isBase64Encoded) {
+    const type = fileType(Buffer.from(body, 'base64'));
+
     if (isBase64Encoded) {
-      const type = fileType(Buffer.from(body, 'base64'));
       if (type && type.mime) {
         return type.mime
       } else {
         return 'application/octet-stream';
       }
     } else {
-      // performance penalty on JSON.parse for large content lengths
-      if (body.length > this.settings.maxJSONParseLength) {
+      if (type && type.mime) {
+        return type.mime
+      } else if (body.length > this.settings.maxJSONParseLength) {
+        // performance penalty on JSON.parse for large content lengths
         return 'text/plain';
       } else {
         try {
@@ -58,12 +61,18 @@ class Integration {
         return;
       }
 
-      this.respond(JSON.parse(data.Payload));
+      this.respond(data.Payload);
     })
     .catch(ex => {
       debug(ex);
       this.res.sendStatus(500);
     });
+  }
+
+  get isRequestBodyBinary() {
+    return this.req.isBinary
+      || !!fileType(this.requestBody)
+      || (this.req.headers['content-type'] && this.req.headers['content-type'] === 'application/octet-stream');
   }
 }
 
