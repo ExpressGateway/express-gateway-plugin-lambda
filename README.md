@@ -1,3 +1,7 @@
+[![npm][npm-version-badge]][npm-package-url]
+[![CircleCI][circleci-badge]][circleci-master-url]
+[![Gitter][gitter-badge]][gitter-room-url]
+
 # Express Gateway AWS Lambda Plugin
 
 * Proxy to AWS Lambda functions with Express Gateway
@@ -38,3 +42,9 @@ Custom Integration Mode takes a look at the `req.egContext.lambda` object and fo
 Copyright © LunchBadger, Inc. and Contributors
 
 [apache-license]: https://github.com/expressgateway/express-gateway-plugin-lambda/blob/master/LICENSE
+[npm-version-badge]: https://img.shields.io/npm/v/express-gateway-plugin-lambda.svg
+[npm-package-url]: https://www.npmjs.com/package/express-gateway-plugin-lambda
+[circleci-badge]: https://circleci.com/gh/ExpressGateway/express-gateway-plugin-lambda/tree/master.svg?style=shield&circle-token=ac6b0e86b46220da43a5ae63a267d12e81ccb2d5
+[circleci-master-url]: https://circleci.com/gh/ExpressGateway/express-gateway-plugin-lambda/tree/master
+[gitter-badge]: https://img.shields.io/gitter/room/expressgateway/express-gateway.svg
+[gitter-room-url]: https://gitter.im/ExpressGateway/express-gateway
