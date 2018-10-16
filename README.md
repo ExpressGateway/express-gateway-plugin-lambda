@@ -6,7 +6,7 @@
 
 * `invocationType` - [`RequestResponse` _(default)_ | `Event` | `DryRun`] - AWS Lambda invocation type.
 * `logType` - [`None` _(default)_ | `Tail`] - AWS Lambda log type.
-* `unhandledStatus - [default: `500`] - When the Lambda function returns with an unhandled error, usually due to an absence of available resources, this status code will be returned to the client.
+* `unhandledStatus` - [default: `500`] - When the Lambda function returns with an unhandled error, usually due to an absence of available resources, this status code will be returned to the client.
 * `useCustomIntegration` - [true | false _(default)_] - Use a custom integration as specified by the `req.egContext.lambda` object.
 * `maxJSONParseLength` - [_(default: 5 * 1.049e+6, 5MiB)_] - Maximum number of bytes to allow for parsing responses as JSON in an attempt to guess the MIME type.
 
