@@ -14,5 +14,5 @@ pipelines:
     policies:
       - lambda-proxy:
         - action:
-            functionName: 'httpExample'
+            functionName: 'customExample'
             useCustomIntegration: true

@@ -3,9 +3,9 @@ const path = require('path');
 const prepare = (configPath) => {
   const config = require('express-gateway/lib/config');
   config.gatewayConfigPath = path.join(configPath, 'gateway.config.yml');
-  config.loadGatewayConfig();
+  config.loadConfig('gateway');
   config.systemConfigPath = path.join(configPath, 'system.config.yml');
-  config.loadSystemConfig();
+  config.loadConfig('system');
 
   disableConfigWatchers();
   silenceLoggers();

@@ -18,5 +18,5 @@ pipelines:
             jscode: 'req.egContext.lambda = { hello: "expression" }'
       - lambda-proxy:
         - action:
-            functionName: 'httpExample'
+            functionName: 'customExample'
             useCustomIntegration: true

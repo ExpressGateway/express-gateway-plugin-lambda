@@ -22,6 +22,4 @@ authorizationCodes:
 
 plugins:
  express-gateway-plugin-lambda:
-   # package: '../../'
    package: '../../../'
-   unhandledStatus: 503
