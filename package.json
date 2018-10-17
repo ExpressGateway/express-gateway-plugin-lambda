@@ -1,6 +1,6 @@
 {
   "name": "express-gateway-plugin-lambda",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0",
   "description": "Proxy to AWS Lambda functions with Express Gateway.",
   "main": "manifest.js",
   "scripts": {
