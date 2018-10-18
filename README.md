@@ -114,6 +114,18 @@ If the `req.egContext.lambda` object is not populated, a default event structure
 
 This plugin will attempt a best guess at the `Content-Type` of the response.  It is recommended to use Proxy Integration whenever possible.
 
+## Credentials
+
+This plugin follows conventions for credentials defined by the AWS Node.js SDK.  See [Setting Credentials in Node.js][aws-sdk-creds] for more information.
+
+When using your local, shared AWS credentials file, make sure you set the `AWS_SDK_LOAD_CONFIG` environment variable to a truthy value.
+
+Example:
+
+```
+AWS_SDK_LOAD_CONFIG=true node server.js
+```
+
 ## License
 
 [Apache-2.0 License][apache-license]
@@ -127,3 +139,4 @@ Copyright © LunchBadger, Inc. and Contributors
 [circleci-master-url]: https://circleci.com/gh/ExpressGateway/express-gateway-plugin-lambda/tree/master
 [gitter-badge]: https://img.shields.io/gitter/room/expressgateway/express-gateway.svg
 [gitter-room-url]: https://gitter.im/ExpressGateway/express-gateway
+[aws-sdk-creds]: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html
