@@ -7,9 +7,9 @@ const gateway = require('express-gateway');
 
 const { prepare } = require('./helpers');
 
-const CONFIG_PATH = path.join(__dirname, './fixtures/basic/config');
+const CONFIG_PATH = path.join(__dirname, './fixtures/proxy/config');
 
-describe('lambda-proxy policy : basic', () => {
+describe('lambda-proxy policy : proxy', () => {
   let app, axiosInstance;
 
   before(done => {
