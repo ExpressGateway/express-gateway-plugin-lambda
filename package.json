@@ -8,7 +8,7 @@
   },
   "author": "Kevin Swiber <kswiber@gmail.com>",
   "license": "Apache-2.0",
-  "keywords": "api, gateway, plugin, aws, lambda, function",
+  "keywords": ["api, gateway, plugin, aws, lambda, function"],
   "dependencies": {
     "aws-sdk": "^2.327.0",
     "debug": "^4.1.0",
