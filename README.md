@@ -4,9 +4,9 @@
 
 # Express Gateway AWS Lambda Plugin
 
-* Proxy to AWS Lambda functions with Express Gateway
+## Proxy to AWS Lambda functions with Express Gateway
 
-## Plugin Settings
+### Plugin Settings
 
 * `invocationType` - [`RequestResponse` _(default)_ | `Event` | `DryRun`] - AWS Lambda invocation type.
 * `logType` - [`None` _(default)_ | `Tail`] - AWS Lambda log type.
