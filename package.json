@@ -1,10 +1,11 @@
 {
   "name": "express-gateway-plugin-lambda",
-  "version": "0.0.0",
+  "version": "0.0.0-development",
   "description": "Proxy to AWS Lambda functions with Express Gateway.",
   "main": "manifest.js",
   "scripts": {
-    "test": "mocha -R spec test"
+    "test": "mocha -R spec test",
+    "semantic-release": "semantic-release"
   },
   "author": "Kevin Swiber <kswiber@gmail.com>",
   "license": "Apache-2.0",
@@ -23,5 +24,9 @@
     "express-gateway": "^1.15.0",
     "mocha": "^6.0.2",
     "semantic-release": "^15.13.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExpressGateway/express-gateway-plugin-lambda.git"
   }
 }
