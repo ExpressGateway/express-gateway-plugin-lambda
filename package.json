@@ -1,6 +1,6 @@
 {
   "name": "express-gateway-plugin-lambda",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Proxy to AWS Lambda functions with Express Gateway.",
   "main": "manifest.js",
   "scripts": {
@@ -8,17 +8,20 @@
   },
   "author": "Kevin Swiber <kswiber@gmail.com>",
   "license": "Apache-2.0",
-  "keywords": ["api, gateway, plugin, aws, lambda, function"],
+  "keywords": [
+    "api, gateway, plugin, aws, lambda, function"
+  ],
   "dependencies": {
-    "aws-sdk": "^2.327.0",
-    "debug": "^4.1.0",
-    "file-type": "^10.0.0",
+    "aws-sdk": "^2.422.0",
+    "debug": "^4.1.1",
+    "file-type": "^10.9.0",
     "raw-body": "^2.3.3"
   },
   "devDependencies": {
-    "aws-sdk-mock": "^4.2.0",
+    "aws-sdk-mock": "^4.3.1",
     "axios": "^0.18.0",
-    "express-gateway": "^1.13.0",
-    "mocha": "^5.2.0"
+    "express-gateway": "^1.15.0",
+    "mocha": "^6.0.2",
+    "semantic-release": "^15.13.3"
   }
 }
