@@ -20,7 +20,7 @@
 
 All plugin settings can be overridden on a per-policy basis.  In addition, here are some policy-specific settings:
 
-* `functionName` - [_(required)_] - Specify the Lambda function name.
+* `functionName` - [_(required)_] - Specify the Lambda function name or ARN.
 * `qualifier` - [_(optional)_] - Specify a Lambda function version or alias name.
 * `ignorePath`- [true | false _(default)_, _(optional, only valid when using Proxy Integration)_] - Don't proxy to the incoming request's URL path.
 * `stripPath` - [true | false _(default)_, _(optional, only valid when using Proxy Integration)_] - Strip the API Endpoint path prefix from the forwarded URL path.
@@ -114,16 +114,30 @@ If the `req.egContext.lambda` object is not populated, a default event structure
 
 This plugin will attempt a best guess at the `Content-Type` of the response.  It is recommended to use Proxy Integration whenever possible.
 
-## Credentials
+## Installation
 
-This plugin follows conventions for credentials defined by the AWS Node.js SDK.  See [Setting Credentials in Node.js][aws-sdk-creds] for more information.
+```
+eg plugin install express-gateway-plugin-lambda
+```
 
-When using your local, shared AWS credentials file, make sure you set the `AWS_SDK_LOAD_CONFIG` environment variable to a truthy value.
+or refer to [Plugin installation guide][plugin-install-guide]
+
+## Credentials & Config
+
+This plugin follows conventions for credentials defined by the AWS Node.js SDK. See [Setting Credentials in Node.js][aws-sdk-creds] for more information.
+
+When using your shared, local AWS config file (for `region` etc.), make sure you set the `AWS_SDK_LOAD_CONFIG` environment variable to a truthy value. Also, see [Configuration and Credential Files][aws-sdk-config]
 
 Example:
 
 ```
-AWS_SDK_LOAD_CONFIG=true node server.js
+AWS_SDK_LOAD_CONFIG=true npm start
+```
+---
+### Debugging:
+If you get `Internal Server Error` from plugin, you can see the extended logs by doing:
+```
+DEBUG=express-gateway-plugin-lambda:* npm start
 ```
 
 ## License
@@ -140,3 +154,5 @@ Copyright © LunchBadger, Inc. and Contributors
 [gitter-badge]: https://img.shields.io/gitter/room/expressgateway/express-gateway.svg
 [gitter-room-url]: https://gitter.im/ExpressGateway/express-gateway
 [aws-sdk-creds]: https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html
+[aws-sdk-config]: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+[plugin-install-guide]: https://www.express-gateway.io/docs/cli/plugins/install/#description
