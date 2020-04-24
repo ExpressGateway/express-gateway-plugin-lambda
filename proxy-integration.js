@@ -17,7 +17,7 @@ class ProxyIntegration extends Integration {
         requestId: req.egContext.requestID
       });
 
-    let requestPath = req.url;
+    let requestPath =  req.params.length > 0 ? req.path :req.url ;
 
     if (settings.stripPath) {
       requestPath =
