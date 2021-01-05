@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "aws-sdk-mock": "^4.3.1",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "express-gateway": "^1.15.0",
     "mocha": "^6.0.2",
     "semantic-release": "^15.13.3"
