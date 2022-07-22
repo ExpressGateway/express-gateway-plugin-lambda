@@ -15,7 +15,7 @@
   "dependencies": {
     "aws-sdk": "^2.422.0",
     "debug": "^4.1.1",
-    "file-type": "^10.9.0",
+    "file-type": "^16.5.4",
     "raw-body": "^2.3.3"
   },
   "devDependencies": {
